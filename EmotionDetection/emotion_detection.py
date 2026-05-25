@@ -7,19 +7,25 @@ def emotion_detector(text_to_analyze):
     headers = {"grpc-metadata-mm-model-id": "emotion_aggregated-workflow_lang_en_stock"}
 
     response = requests.post(url,json=myobj, headers=headers)
-    response_json = json.loads(response.text)
-    anger = response_json['emotionPredictions'][0]['emotion']['anger']
-    disgust = response_json['emotionPredictions'][0]['emotion']['disgust']
-    fear = response_json['emotionPredictions'][0]['emotion']['fear']
-    joy = response_json['emotionPredictions'][0]['emotion']['joy']
-    sadness = response_json['emotionPredictions'][0]['emotion']['sadness']
-    emotions = [anger, disgust, fear, joy, sadness]
-    emotions_names = ["Anger", "Disgust", "Fear", "Joy", "Sadness"]
-    dominant_emotion = emotions[0]
-    index = 0
-    for i, emotion in enumerate(emotions):
-        if(emotion > dominant_emotion):
-            dominant_emotion = emotion
-            index = i
-    response_formatted = {'anger': anger, "disgust": disgust, "fear": fear, "joy": joy, "sadness":sadness, "dominant_emotion": emotions_names[index] }   
-    return response_formatted
+    if response.status_code == 200:
+        response_json = json.loads(response.text)
+        anger = response_json['emotionPredictions'][0]['emotion']['anger']
+        disgust = response_json['emotionPredictions'][0]['emotion']['disgust']
+        fear = response_json['emotionPredictions'][0]['emotion']['fear']
+        joy = response_json['emotionPredictions'][0]['emotion']['joy']
+        sadness = response_json['emotionPredictions'][0]['emotion']['sadness']
+        emotions = [anger, disgust, fear, joy, sadness]
+        emotions_names = ["Anger", "Disgust", "Fear", "Joy", "Sadness"]
+        dominant_emotion = emotions[0]
+        index = 0
+        for i, emotion in enumerate(emotions):
+            if(emotion > dominant_emotion):
+                dominant_emotion = emotion
+                index = i
+        response_formatted = {'anger': anger, "disgust": disgust, "fear": fear, "joy": joy, "sadness":sadness, "dominant_emotion": emotions_names[index] }   
+        return response_formatted
+    elif response.status_code == 400:
+        return {'anger': None, "disgust": None, "fear": None, "joy": None, "sadness":None, "dominant_emotion": None }
+    else: 
+        return {'anger': None, "disgust": None, "fear": None, "joy": None, "sadness":None, "dominant_emotion": None }
+    
